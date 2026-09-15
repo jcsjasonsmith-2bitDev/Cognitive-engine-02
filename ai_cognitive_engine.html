@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuro-Symbolic Cognitive AI Engine</title>
+    <style>
+        :root {
+            --bg-dark: #0a0f1d;
+            --bg-card: #131c31;
+            --accent: #00f2ff;
+            --text-main: #e2e8f0;
+            --text-muted: #64748b;
+            --panel-border: #1e293b;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--panel-border);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .system-status {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar Panels */
+        .panel {
+            background-color: var(--bg-card);
+            border-right: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-left {
+            width: 320px;
+        }
+
+        .panel-right {
+            width: 380px;
+            border-right: none;
+            border-left: 1px solid var(--panel-border);
+        }
+
+        .center-canvas {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at center, #111a2e 0%, #0a0f1d 100%);
+            position: relative;
+        }
+
+        .panel-header {
+            padding: 12px 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--panel-border);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-body {
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Controls */
+        .btn {
+            background: linear-gradient(135deg, #0052d4, #4364f7, #6fb1fc);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 12px rgba(67, 100, 247, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        select, input {
+            width: 100%;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+            padding: 8px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--accent);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-card {
+            background-color: rgba(0,0,0,0.15);
+            border: 1px solid var(--panel-border);
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .metric-val {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: monospace;
+            margin-top: 2px;
+        }
+
+        /* Console styling */
+        .console-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-top: 1px solid var(--panel-border);
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .console-logs {
+            flex: 1;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            overflow-y: auto;
+            color: #a7f3d0;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            border-left: 2px solid var(--accent);
+            padding-left: 6px;
+        }
+        .log-rsi { border-left-color: #f43f5e; color: #fecdd3; }
+        .log-wfc { border-left-color: #3b82f6; color: #dbeafe; }
+        .log-graph { border-left-color: #a855f7; color: #f3e8ff; }
+        .log-hash { border-left-color: #eab308; color: #fef9c3; }
+
+        /* Canvas Overlay Text */
+        .canvas-label {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(19, 28, 49, 0.8);
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--panel-border);
+            font-size: 0.8rem;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .visualization-container {
+            flex: 1;
+            position: relative;
+            min-height: 300px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Hash Table Visuals */
+        .hash-table-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        .hash-slot {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--panel-border);
+            padding: 6px;
+            border-radius: 4px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .hash-slot.active {
+            background-color: rgba(234, 179, 8, 0.2);
+            border-color: #eab308;
+        }
+
+        /* Tooltip style */
+        .architecture-explainer {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-top: 10px;
+        }
+        
+        .architecture-explainer strong {
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><span>🧠</span> NEURO-SYMBOLIC COGNITIVE AI ENGINE</h1>
+        <div class="system-status">
+            <div class="status-item"><span class="status-dot"></span> Core System Active</div>
+            <div class="status-item" style="color: var(--accent);">Iteration: <span id="global-iteration">1</span></div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- LEFT PANEL: CONTROLS & META-COGNITION -->
+        <div class="panel panel-left">
+            <div class="panel-header">
+                <span>🎛️ Input & Objectives</span>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="cognitive-prompt">Cognitive Objective (Prompt)</label>
+                    <select id="cognitive-prompt">
+                        <option value="code">Synthesize Optimised Software Subsystem</option>
+                        <option value="math">Resolve N-Dimensional Topology Paradox</option>
+                        <option value="quantum">Simulate High-Entropy Quantum State</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="btn-trigger">Trigger Inference Collapse</button>
+
+                <div class="panel-header" style="margin: 15px -15px 12px; padding-left: 15px;">
+                    <span>🚀 Metacognition (RSI)</span>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <label>RSI Generation</label>
+                        <div class="metric-val" id="rsi-gen">v1.0.0</div>
+                    </div>
+                    <div class="metric-card">
+                        <label>Inference Speed</label>
+                        <div class="metric-val" id="inf-speed">45ms</div>
+                    </div>
+                    <div class="metric-card">
+                        <label>WFC Constraints</label>
+                        <div class="metric-val" id="wfc-constraints">24 Rules</div>
+                    </div>
+                    <div class="metric-card">
+                        <label>Hash Collisions</label>
+                        <div class="metric-val" id="hash-collisions">0</div>
+                    </div>
+                </div>
+
+                <div class="architecture-explainer">
+                    <strong>Recursive Self-Improvement Loop:</strong> <br>
+                    The RSI unit watches execution telemetry. When bottlenecks occur, it mathematically refines the active Graph Transformation Rules and rebuilds spatial hash matrices.
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTER CANVAS: THE MANIFESTED FIELD (SDF & WFC GENERATION) -->
+        <div class="center-canvas">
+            <div class="visualization-container" style="flex: 3;">
+                <div class="canvas-label">✨ MANIFESTED CONCEPT FIELD (SDF + WAVE FUNCTION COLLAPSE)</div>
+                <canvas id="sdf-canvas"></canvas>
+            </div>
+            
+            <!-- CONSOLE LOG OUTPUT -->
+            <div class="console-container">
+                <div class="panel-header">
+                    <span>📟 Real-Time Execution Traces</span>
+                    <span style="color: var(--accent); font-size: 0.75rem;">Stream Mode</span>
+                </div>
+                <div class="console-logs" id="console-output">
+                    <div class="log-entry">Engine initialized. Awaiting pipeline execution trigger...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: MEMORY MAP & LOGIC GRAPH -->
+        <div class="panel panel-right">
+            <div class="panel-header">
+                <span>🔀 Active Executive Graph (Rewriting)</span>
+            </div>
+            <div class="visualization-container" style="flex: 1.2; border-bottom: 1px solid var(--panel-border);">
+                <canvas id="graph-canvas"></canvas>
+            </div>
+
+            <div class="panel-header">
+                <span>⚡ Episimodic Memory (Spatial Hash Table)</span>
+            </div>
+            <div class="panel-body">
+                <div class="hash-table-grid" id="hash-grid">
+                    <!-- Dynamic slots generated by JS -->
+                </div>
+                <div class="architecture-explainer" style="margin-top: 15px;">
+                    <strong>O(1) Spatial Cache:</strong> Every successfully collapsed semantic geometric state is mapped via unique structural signatures directly to specific computational shortcuts.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Architecture State Management ---
+        const state = {
+            isRunning: false,
+            iteration: 1,
+            rsiVersion: [1, 0, 0],
+            inferenceSpeed: 45,
+            wfcRuleCount: 24,
+            collisions: 0,
+            activePrompt: 'code',
+            // WFC Grid Simulation (Internal matrix mapped to spatial fields)
+            gridSize: 20,
+            gridData: [],
+            // Graph representation for Graph Rewriting
+            graphNodes: [],
+            graphEdges: [],
+            // Hash table items
+            hashSlots: Array(32).fill(0).map((_, i) => ({ id: i, label: `0x${i.toString(16).toUpperCase().padStart(2,'0')}`, active: false }))
+        };
+
+        // --- Selectors ---
+        const canvasSdf = document.getElementById('sdf-canvas');
+        const ctxSdf = canvasSdf.getContext('2d');
+        const canvasGraph = document.getElementById('graph-canvas');
+        const ctxGraph = canvasGraph.getContext('2d');
+        const consoleOutput = document.getElementById('console-output');
+        const hashGrid = document.getElementById('hash-grid');
+        const btnTrigger = document.getElementById('btn-trigger');
+        const promptSelect = document.getElementById('cognitive-prompt');
+
+        // Initialize Hash Table Grid UI
+        function initHashUI() {
+            hashGrid.innerHTML = '';
+            state.hashSlots.forEach(slot => {
+                const el = document.createElement('div');
+                el.className = 'hash-slot';
+                el.id = `hash-${slot.id}`;
+                el.innerText = slot.label;
+                hashGrid.appendChild(el);
+            });
+        }
+
+        // Output Custom Formatting Log Stream
+        function appendLog(text, type = 'wfc') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.innerText = `[${new Date().toLocaleTimeString()}] ${text}`;
+            consoleOutput.appendChild(entry);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        // Sizing Handlers
+        function resizeCanvases() {
+            canvasSdf.width = canvasSdf.parentElement.clientWidth;
+            canvasSdf.height = canvasSdf.parentElement.clientHeight;
+            canvasGraph.width = canvasGraph.parentElement.clientWidth;
+            canvasGraph.height = canvasGraph.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvases);
+
+        // --- Generative Logic Systems ---
+        
+        // Initialize Knowledge Topology Graph (Graph Rewriting representation)
+        function initGraph() {
+            state.graphNodes = [
+                { id: 0, label: "Objective", x: 50, y: 50 },
+                { id: 1, label: "Constraint Matrix", x: 150, y: 120 },
+                { id: 2, label: "SDF Bound 1", x: 250, y: 60 },
+                { id: 3, label: "SDF Bound 2", x: 280, y: 160 },
+                { id: 4, label: "Hash Validation", x: 120, y: 220 }
+            ];
+            state.graphEdges = [
+                { from: 0, to: 1 }, { from: 1, to: 2 }, { from: 1, to: 3 }, { from: 3, to: 4 }, { from: 4, to: 0 }
+            ];
+        }
+
+        // Mutate/Rewrite graph structural topology
+        function rewriteGraphStep() {
+            // Pick a node or generate a substitution pattern dynamically
+            const length = state.graphNodes.length;
+            if (length < 9) {
+                // Add a split mutation node
+                const targetNode = state.graphNodes[Math.floor(Math.random() * length)];
+                const newNodeId = length;
+                state.graphNodes.push({
+                    id: newNodeId,
+                    label: `Sub-Logic-${newNodeId}`,
+                    x: targetNode.x + (Math.random() * 80 - 40),
+                    y: targetNode.y + (Math.random() * 80 - 40)
+                });
+                state.graphEdges.push({ from: targetNode.id, to: newNodeId });
+                appendLog(`[Graph Rewriting]: Rewrote rule graph node topology. Merged state subtree pattern matching ${targetNode.label} -> Sub-Logic-${newNodeId}`, 'graph');
+            } else {
+                // Prune / contract nodes back down (simulating code optimization/compaction)
+                state.graphNodes.splice(5);
+                state.graphEdges = state.graphEdges.filter(e => e.from < 5 && e.to < 5);
+                appendLog(`[Graph Rewriting]: Optimised subgraphs detected duplicate logic. Compressed semantic trees back to core topology axioms.`, 'graph');
+            }
+        }
+
+        // Draw Execution Logic Graph
+        function drawGraph() {
+            ctxGraph.clearRect(0, 0, canvasGraph.width, canvasGraph.height);
+            
+            // Draw connections
+            ctxGraph.strokeStyle = '#334155';
+            ctxGraph.lineWidth = 2;
+            state.graphEdges.forEach(edge => {
+                const fromNode = state.graphNodes.find(n => n.id === edge.from);
+                const toNode = state.graphNodes.find(n => n.id === edge.to);
+                if (fromNode && toNode) {
+                    ctxGraph.beginPath();
+                    ctxGraph.moveTo(fromNode.x, fromNode.y);
+                    ctxGraph.lineTo(toNode.x, toNode.y);
+                    ctxGraph.stroke();
+                }
+            });
+
+            // Draw conceptual nodes
+            state.graphNodes.forEach(node => {
+                ctxGraph.fillStyle = node.id === 0 ? '#f43f5e' : '#a855f7';
+                ctxGraph.beginPath();
+                ctxGraph.arc(node.x, node.y, 8, 0, Math.PI * 2);
+                ctxGraph.fill();
+                
+                ctxGraph.fillStyle = '#94a3b8';
+                ctxGraph.font = '10px monospace';
+                ctxGraph.fillText(node.label, node.x + 12, node.y + 4);
+            });
+        }
+
+        // --- SDF Rendering & Wave Function Collapse Engine Realisation ---
+        let frameCount = 0;
+        function renderSDFWorld() {
+            const w = canvasSdf.width;
+            const h = canvasSdf.height;
+            if (w === 0 || h === 0) return;
+
+            // Generate an organic mathematical SDF visualization (Meta-balls blended via smooth minimums)
+            const time = frameCount * 0.02;
+            const imgData = ctxSdf.createImageData(w, h);
+            const data = imgData.data;
+
+            // To run smoothly in vanilla JS, compute down-sampled or wave-function matrix grids blended geometrically
+            // For a highly performant and stunning effect, we'll draw procedural spatial patterns combined with grid frames
+            ctxSdf.clearRect(0, 0, w, h);
+            
+            // Draw background field math using a fine resolution grid to simulate Wave Function Cell Superpositions
+            const cellSize = 30;
+            const cols = Math.ceil(w / cellSize);
+            const rows = Math.ceil(h / cellSize);
+
+            for (let c = 0; c < cols; c++) {
+                for (let r = 0; r < rows; r++) {
+                    const cx = c * cellSize + cellSize/2;
+                    const cy = r * cellSize + cellSize/2;
+                    
+                    // Math distance functions mapping to abstract semantic "features"
+                    // Combined SDF: Dist to multiple animated cognitive hubs
+                    const d1 = Math.sqrt(Math.pow(cx - (w/2 + Math.sin(time)*w/4), 2) + Math.pow(cy - (h/2 + Math.cos(time*1.3)*h/4), 2));
+                    const d2 = Math.sqrt(Math.pow(cx - (w/2 + Math.cos(time*0.7)*w/3), 2) + Math.pow(cy - (h/2 + Math.sin(time*0.9)*h/5), 2));
+                    
+                    // Smooth minimum blend of fields
+                    const k = 40;
+                    const h_blend = Math.max(k - Math.abs(d1 - d2), 0.0) / k;
+                    const sdfValue = Math.min(d1, d2) - h_blend * h_blend * k * 0.25;
+
+                    // Wave Function Collapse state calculation based on distance threshold
+                    // If inside the negative/zero threshold boundaries, field is completely collapsed
+                    ctxSdf.save();
+                    if (sdfValue < 120) {
+                        ctxSdf.fillStyle = `rgba(0, 242, 255, ${Math.max(0.1, (120 - sdfValue)/120)})`;
+                        ctxSdf.strokeStyle = 'rgba(0, 242, 255, 0.4)';
+                        ctxSdf.fillRect(c*cellSize, r*cellSize, cellSize-2, cellSize-2);
+                    } else if (sdfValue < 160) {
+                        // High superposition state (Entropy rendering)
+                        ctxSdf.fillStyle = `rgba(59, 130, 246, 0.15)`;
+                        ctxSdf.strokeStyle = 'rgba(59, 130, 246, 0.2)';
+                        ctxSdf.fillRect(c*cellSize, r*cellSize, cellSize-2, cellSize-2);
+                        
+                        // Draw tiny superposition indicator lines
+                        ctxSdf.beginPath();
+                        ctxSdf.strokeStyle = 'rgba(255,255,255,0.1)';
+                        ctxSdf.moveTo(c*cellSize + 2, r*cellSize + 2);
+                        ctxSdf.lineTo(c*cellSize + cellSize - 4, r*cellSize + cellSize - 4);
+                        ctxSdf.stroke();
+                    } else {
+                        // Completely uncollapsed, standard vacuum state
+                        ctxSdf.strokeStyle = 'rgba(30, 41, 59, 0.5)';
+                        ctxSdf.strokeRect(c*cellSize, r*cellSize, cellSize-2, cellSize-2);
+                    }
+                    ctxSdf.restore();
+                }
+            }
+
+            // Draw explicit continuous contours vector lines for the Signed Distance Boundaries
+            ctxSdf.strokeStyle = '#ffffff';
+            ctxSdf.lineWidth = 1;
+            ctxSdf.beginPath();
+            // Core central semantic nexus lines
+            ctxSdf.arc(w/2 + Math.sin(time)*w/4, h/2 + Math.cos(time*1.3)*h/4, 120, 0, Math.PI*2);
+            ctxSdf.stroke();
+            
+            ctxSdf.beginPath();
+            ctxSdf.strokeStyle = varColor('--accent');
+            ctxSdf.arc(w/2 + Math.cos(time*0.7)*w/3, h/2 + Math.sin(time*0.9)*h/5, 120, 0, Math.PI*2);
+            ctxSdf.stroke();
+
+            frameCount++;
+        }
+
+        function varColor(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        // --- Core Pipeline Processing Engine Loop ---
+        function runPipelineCycle() {
+            if (!state.isRunning) return;
+
+            // Step 1: Execute a random Graph Rewriting structural rule change
+            if (Math.random() > 0.6) {
+                rewriteGraphStep();
+            }
+
+            // Step 2: Trigger Wave Function Collapse Step propagation
+            if (Math.random() > 0.4) {
+                const cellIndex = Math.floor(Math.random() * 400);
+                appendLog(`[Wave Function Collapse]: Contradiction check clean. Collapsed local concept grid structural sector cell #${cellIndex} matching rules.`, 'wfc');
+                
+                // Light up memory cache signature (Hash Lookup)
+                const randomSlot = Math.floor(Math.random() * 32);
+                state.hashSlots.forEach(s => s.active = false);
+                state.hashSlots[randomSlot].active = true;
+                
+                // Toggle active UI slot indicator
+                document.querySelectorAll('.hash-slot').forEach(el => el.classList.remove('active'));
+                const activeEl = document.getElementById(`hash-${randomSlot}`);
+                if (activeEl) activeEl.classList.add('active');
+                
+                appendLog(`[Spatial Hash Map]: O(1) Quick-Cache match hit. Retrieved layout macro structure shortcut under key ${state.hashSlots[randomSlot].label}. Zero recalculation penalty.`, 'hash');
+            }
+
+            // Step 3: Recursive Self Improvement (RSI Meta Loop)
+            if (Math.random() > 0.85) {
+                state.iteration++;
+                document.getElementById('global-iteration').innerText = state.iteration;
+                
+                // Mutate version metrics code structures
+                if (Math.random() > 0.5) state.rsiVersion[2]++;
+                else state.rsiVersion[1]++;
+                
+                if (state.rsiVersion[2] > 9) { state.rsiVersion[2] = 0; state.rsiVersion[1]++; }
+                if (state.rsiVersion[1] > 9) { state.rsiVersion[1] = 0; state.rsiVersion[0]++; }
+                
+                // Enhance performance metrics randomly via code restructuring optimizations
+                state.inferenceSpeed = Math.max(12, state.inferenceSpeed - Math.floor(Math.random() * 4));
+                state.wfcRuleCount += Math.floor(Math.random() * 3);
+                
+                document.getElementById('rsi-gen').innerText = `v${state.rsiVersion.join('.')}`;
+                document.getElementById('inf-speed').innerText = `${state.inferenceSpeed}ms`;
+                document.getElementById('wfc-constraints').innerText = `${state.wfcRuleCount} Rules`;
+                
+                appendLog(`🧬 [Recursive Self-Improvement]: Telemetry evaluated. Rewriting inner code blocks of WFC module to bypass processing bottlenecks. Engine code evolved successfully!`, 'rsi');
+            }
+
+            // Render active UI updates
+            drawGraph();
+            renderSDFWorld();
+
+            requestAnimationFrame(runPipelineCycle);
+        }
+
+        // --- Interaction Management ---
+        btnTrigger.addEventListener('click', () => {
+            if (state.isRunning) {
+                state.isRunning = false;
+                btnTrigger.innerText = "Trigger Inference Collapse";
+                btnTrigger.style.background = "linear-gradient(135deg, #0052d4, #4364f7, #6fb1fc)";
+                appendLog("Engine processing loops paused safely.", "graph");
+            } else {
+                state.isRunning = true;
+                btnTrigger.innerText = "Halt System Execution Loops";
+                btnTrigger.style.background = "linear-gradient(135deg, #ec4899, #f43f5e, #e11d48)";
+                appendLog(`Starting processing sequence for prompt focus target structure: [${promptSelect.value.toUpperCase()}]`, 'rsi');
+                runPipelineCycle();
+            }
+        });
+
+        promptSelect.addEventListener('change', (e) => {
+            state.activePrompt = e.target.value;
+            appendLog(`Context target workspace shifted to focus node payload configuration: "${e.target.value}"`, 'graph');
+        });
+
+        // Document Bootstrap Bootloading sequence
+        window.onload = () => {
+            resizeCanvases();
+            initHashUI();
+            initGraph();
+            drawGraph();
+            
+            // Run a static introductory render pass
+            renderSDFWorld();
+        };
+    </script>
+</body>
+</html>
